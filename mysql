@@ -147,8 +147,6 @@ IN p_user_id int(11)
 BEGIN
     (select *, 0 from mobiles where owner = p_user_id) union (select *, 1 from laptops where owner = p_user_id);
 END$$
- 
-DELIMITER ;
 #######################################################################
 DROP procedure IF EXISTS sp_getMobileByUser;
 DELIMITER $$
@@ -481,6 +479,7 @@ DELIMITER ;
 
 DELIMITER $$
 USE `Linder`$$
+DROP procedure IF EXISTS sp_deleteMobileSubscription;
 DROP PROCEDURE IF EXISTS sp_deleteMobileSubscription;
 CREATE PROCEDURE `sp_deleteMobileSubscription` (
 IN MOBILEIDIN INT
@@ -560,9 +559,10 @@ END$$
 DELIMITER ;
 
 ######################################################################
-
+DELIMITER $$
 DELIMITER $$
 USE `Linder`$$
+DROP procedure IF EXISTS sp_deleteLaptop;
 CREATE PROCEDURE `sp_deleteLaptop` (
 IN p_laptop_id int
 )
@@ -668,3 +668,21 @@ BEGIN
     where A.laptopID = p_dev_id;
 END$$
 DELIMITER ;
+
+
+
+##############################################
+DROP procedure IF EXISTS sp_getLatLng;
+DELIMITER $$
+USE `Linder`$$
+CREATE PROCEDURE `sp_getLatLng` (
+IN p_user_id int(11)
+)
+BEGIN
+    select latitude, longitude, name, mobile from user where id = p_user_id;
+END$$
+ 
+DELIMITER ;
+
+
+

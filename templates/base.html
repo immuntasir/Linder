@@ -42,10 +42,11 @@
                   <li class="nav-item">
                     <a class="nav-link" href="showDeviceSearch"> Search </a>
                   </li>
+                  {% if session.type == 1 %}
                   <li class="nav-item">
-                    <a class="nav-link" href="showAddDevice"> Sell </a>
+                    <a class="nav-link" href="showAddDevice"> Add Device </a>
                   </li>
-                  
+                  {% endif %}
                 </ul>
                 <div class="navbar-nav">
                   <a class="nav-item nav-link" href="/logout">Logout</a>

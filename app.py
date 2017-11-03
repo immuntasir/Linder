@@ -2,7 +2,8 @@ from flaskext.mysql import MySQL
 from flask import Flask, render_template, json, request,redirect,session,jsonify
 from werkzeug import generate_password_hash, check_password_hash
 import abc, six
-
+from geopy.distance import vincenty
+from geopy.geocoders import Nominatim
 
 
 #@linderApp.route('/favicon.ico')
@@ -64,7 +65,7 @@ class SingleDatabase:
         self.__con.commit()
 ###########################################
 singleDatabase = SingleDatabase(linderApp).getDatabase()
-
+###########################################
 @linderApp.route('/')
 def main():
     
@@ -72,6 +73,119 @@ def main():
 ###########################################
 
 
+###########################################
+
+@six.add_metaclass(abc.ABCMeta)
+class State():
+    @abc.abstractmethod
+    def logIn(self, information):
+        pass
+    @abc.abstractmethod
+    def logOut(self):
+        pass
+class LogIn:
+    def actualLogIn(self, information):
+        try:
+            _username = information['inputEmail']
+            _password = information['inputPassword']
+            cursor = singleDatabase.getCursor()
+            cursor.callproc('sp_validateLogin',(_username, _password))
+            data = cursor.fetchall()
+            if len(data) > 0:
+                session['user'] = data[0][0]
+                session['type'] = data[0][5]
+                return data[0][5]
+            else:
+                return render_template('error.html',error = 'HAHAHAHAHA.')
+        except:
+            return render_template('error.html',error = 'HAHAHAHAHA.')
+        finally:
+            singleDatabase.closeCursor()
+            singleDatabase.closeCon()
+            
+class LoggedInAsBuyer(State):
+    def __init__(self, logger):
+        self._logger = logger    
+    def logIn(self, information):
+        return render_template('error.html', error ="Already logged in")
+    def logOut(self):
+        try:
+            session.pop('user',None)
+            self._logger.setState(self._logger._loggedOutState)
+        except:
+            return render_template('error.html', error = "Something went wrong")
+        return True
+
+
+class LoggedInAsSeller(State):
+    def __init__(self, logger):
+        self._logger = logger
+        
+    def logIn(self, information):
+        return render_template('error.html', error = "Already logged in")
+    def logOut(self):
+        try:
+            session.pop('user',None)
+            self._logger.setState(self._logger._loggedOutState)
+        except:
+            return render_template('error.html', error = "Something went wrong")
+        return True
+        
+
+class LoggedOutState(State):
+    def __init__(self, logger):
+        self._logger = logger
+    def logIn(self, information):
+        login = LogIn()
+        _usertype = login.actualLogIn(information)
+        print(str(_usertype) + "usertype lol")
+        if _usertype == 0:
+            print("i am here")
+            self._logger.setState(self._logger._loggedInAsBuyer)
+            print("should redirect to userome")
+        elif _usertype == 1:
+            self._logger.setState(self._logger._loggedInAsSeller)
+        return _usertype
+    def logOut(self):
+        return render_template("error.html", error = "Shouldn't access this page")
+
+class Logger:
+    def __init__(self):
+        self._loggedInAsBuyer = LoggedInAsBuyer(self)
+        self._loggedInAsSeller = LoggedInAsSeller(self)
+        self._loggedOutState = LoggedOutState(self)
+        self._state = self._loggedOutState
+    def setState (self, state):
+        self._state = state
+    def logIn(self, information):
+        return self._state.logIn(information)
+    def logOut(self):
+        return self._state.logOut()
+
+
+logger = Logger()
+@linderApp.route('/logout')
+def logout():
+    retvalue = logger.logOut()
+    if retvalue == 1 : 
+        return redirect('/')
+@linderApp.route('/validateLogin',methods=['POST'])
+def validateLogin():
+    try:
+        information = request.form
+        _usertype = logger.logIn(information)
+        print(_usertype)
+        print("here")
+        if _usertype == 0:
+            return redirect('/userHome')
+        elif _usertype == 1:
+            return redirect('/userHome')
+        else:
+            return render_template('error.html', error = "Something fishy") 
+
+    except Exception as e:
+        return render_template('error.html',error = str(e))
+    
 
 ##########################
 ###This section will implement the abstract factory pattern. 
@@ -140,7 +254,18 @@ class AbstractProductA:
         pass
 
 # User
-class BuyerProduct(AbstractProductA):
+@six.add_metaclass(abc.ABCMeta)
+class SuperUser:
+    def modifyInformation(self, list):
+        self._name = str(list[0])
+        self._username = str(list[1])
+        self._email = str(list[2])
+        self._mobile = str(list[3])
+        self._password = str(list[4])
+        self._latitude = float(list[5])
+        self._longitude = float(list[6])
+        
+class BuyerProduct(AbstractProductA, SuperUser):
     """
     Define a product object to be created by the corresponding concrete
     factory.
@@ -148,29 +273,17 @@ class BuyerProduct(AbstractProductA):
     """
 
     def createProduct(self, list):
-        print(list)
-        self._name = str(list[0])
-        self._username = str(list[1])
-        self._email = str(list[2])
-        self._mobile = str(list[3])
+        self.modifyInformation(list)
         self._usertype = 0
-        self._password = str(list[4])
-        self._latitude = float(list[5])
-        self._longitude = float(list[6])
-        
+                
     def addToDB(self, cursor):
         cursor.callproc('sp_createUser',(self._name,  self._username, self._email, self._mobile, self._usertype, self._password, 
                                             self._latitude, self._longitude))
         return cursor.fetchall()
 
-class LaptopProduct(AbstractProductA):
-    """
-    Define a product object to be created by the corresponding concrete
-    factory.
-    Implement the AbstractProduct interface.
-    """
-
-    def createProduct(self, list):
+@six.add_metaclass(abc.ABCMeta)
+class SuperProduct:
+    def modifySpecs(self, list):
         self._model = list['inputModel']
         self._owner = session.get('user')            
         self._processor = list['inputProcessor']
@@ -178,6 +291,16 @@ class LaptopProduct(AbstractProductA):
         self._storage = list['inputStorage']
         self._price = list['inputPrice']
         self._additional = list['inputAdditional']
+
+class LaptopProduct(AbstractProductA, SuperProduct):
+    """
+    Define a product object to be created by the corresponding concrete
+    factory.
+    Implement the AbstractProduct interface.
+    """
+
+    def createProduct(self, list):
+        self.modifySpecs(list)
         
     def addToDB(self, cursor):
         cursor.callproc('sp_createLaptop',(self._owner,  self._model, self._processor, self._ram, self._storage, self._price, 
@@ -196,21 +319,15 @@ class AbstractProductB():
     def addToDB(self, cursor):
         pass
 
-class SellerProduct(AbstractProductB):
+class SellerProduct(AbstractProductB, SuperUser):
     """
     Define a product object to be created by the corresponding concrete
     factory.
     Implement the AbstractProduct interface.
     """
     def createProduct(self, list):
-        self._name = str(list[0])
-        self._username = str(list[1])
-        self._email = str(list[2])
-        self._mobile = str(list[3])
+        self.modifyInformation(list)
         self._usertype = 1
-        self._password = str(list[4])
-        self._latitude = float(list[5])
-        self._longitude = float(list[6])
         
     def addToDB(self, cursor):
         cursor.callproc('sp_createUser',(self._name,  self._username, self._email, self._mobile, self._usertype, self._password, 
@@ -218,7 +335,7 @@ class SellerProduct(AbstractProductB):
         return cursor.fetchall()
 
 
-class MobileProduct(AbstractProductB):
+class MobileProduct(AbstractProductB, SuperProduct):
     """
     Define a product object to be created by the corresponding concrete
     factory.
@@ -226,14 +343,8 @@ class MobileProduct(AbstractProductB):
     """
 
     def createProduct(self, list):
-        self._model = list['inputModel']
-        self._owner = session.get('user')            
-        self._processor = list['inputProcessor']
-        self._ram = list['inputRAM']
-        self._storage = list['inputStorage']
+        self.modifySpecs(list)
         self._camera = list['inputCamera']
-        self._price = list['inputPrice']
-        self._additional = list['inputAdditional']
     def addToDB(self, cursor):
         cursor.callproc('sp_createMobile',(self._owner,  self._model, self._processor, self._ram, self._storage, self._camera, self._price, 
                                             self._additional))
@@ -357,11 +468,11 @@ def addDevice():
 #######
 
 class SearchStrategy:
-    def Search(self, list):
+    def search(self, list):
         pass
 
 class LaptopSearch(SearchStrategy):
-    def Search(self, list):
+    def search(self, list):
         cursor = singleDatabase.getCursor()
         cursor.callproc('sp_getLaptopBySpecs', (list[0], list[1], list[2], list[3], list[4]))
         print("here...")
@@ -390,7 +501,7 @@ class LaptopSearch(SearchStrategy):
         return laptops_dict
 
 class MobileSearch(SearchStrategy):
-    def Search(self, list):
+    def search(self, list):
         cursor = singleDatabase.getCursor()
         cursor.callproc('sp_getMobileBySpecs', (list[0], list[1], list[2], list[5], list[3], list[4]))
         mobiles = cursor.fetchall()
@@ -474,21 +585,21 @@ class DistanceDecorator(Decorator):
         devices_dict = self._component.search(listOfSpecs)
         cursor = singleDatabase.getCursor()
         print("HERE")
+        _user = session.get('user')
+        cursor.callproc('sp_getLatLng', (_user, ) )
+        information = cursor.fetchall()
+        my_distance = (float(information[0][0]), float(information[0][1]))
         for device in devices_dict:
-            _user = session.get('user')
-            cursor.callproc('sp_getLatLng', (_user, ) )
-            my_distance = cursor.fetchall()
             cursor.callproc('sp_getLatLng', (device['Owner'], ) )
-            distance = cursor.fetchall()
-            print("Loc : " )
-            print(distance[0][0])
-            print(distance[0][1])
-           
-            device['Distance'] = (str(vincenty(my_distance, distance).kilometers) + "kilometers")  
-            geolocator = Nominatim()
+            information = cursor.fetchall()
+            distance = (float(information[0][0]), float(information[0][1]))
+            device['Distance'] = (str(vincenty(my_distance, distance).kilometers))  
+            device['Owner'] = information[0][2]
+            device['Mobile'] = information[0][3]
+            #geolocator = Nominatim()
             
-            location = geolocator.reverse(distance[0])
-            print(location.address)
+            #location = geolocator.reverse(distance[0])
+            #print(location.address)
  
         singleDatabase.closeCursor()
         singleDatabase.closeCon()
@@ -509,15 +620,16 @@ class MainSearch(Component):
         _price = listOfSpecs['inputPrice']
         _type = listOfSpecs['devicetype']
         speclist = [_model, _processor, _ram, _storage, _price]
-        
-        if type == 'mobile' :
+        print("will search")
+        if _type == 'mobile' :
+            print("here for the mobiels")
             _camera = request.form['inputCamera']
             speclist.append(_camera)
             searcher = MobileSearch()
         else :
             searcher = LaptopSearch() 
         
-        devices_dict = searcher.Search(speclist)
+        devices_dict = searcher.search(speclist)
         return devices_dict
 
 @linderApp.route('/deviceSearcher',methods=['POST'])
@@ -643,33 +755,6 @@ def userHome():
         singleDatabase.closeCursor()
     
 
-@linderApp.route('/logout')
-def logout():
-    session.pop('user',None)
-    return redirect('/')
-@linderApp.route('/validateLogin',methods=['POST'])
-def validateLogin():
-    try:
-        _username = request.form['inputEmail']
-        _password = request.form['inputPassword']
-        
-         # connect to mysql
-        cursor = singleDatabase.getCursor()
-        print(cursor)
-        cursor.callproc('sp_validateLogin',(_username, _password))
-        data = cursor.fetchall()
-        if len(data) > 0:
-            session['user'] = data[0][0]
-            return redirect('/userHome')
-        else:
-            return render_template('error.html',error = 'HAHAHAHAHA.')
-                
-
-    except Exception as e:
-        return render_template('error.html',error = str(e))
-    finally:
-        singleDatabase.closeCursor()
-        singleDatabase.closeCon()
 
 
 #############################################################################
@@ -801,12 +886,12 @@ def subscriptionLaptop():
             print ( int(my_id))
             cursor.callproc('sp_addLaptopSubscription', (int(_user), int(my_id)))                
             print("Subscription Added")
-            return render_template("subscription.html", message = 'Subscribed successfully')
+            return render_template("success.html", message = 'Subscribed successfully')
         else:
             print "No user"
     except:
         print("Exception Raised")    
-        return render_template("error.html", error = 'You already subscibed here')
+        return render_template("success.html", error = 'You already subscibed here')
     finally:
         singleDatabase.commit()
         singleDatabase.closeCursor()
@@ -825,12 +910,12 @@ def subscriptionMobile():
             print ( int(my_id))
             cursor.callproc('sp_addMobileSubscription', (int(_user), int(my_id)))                
             print("Subscription Added")
-            return render_template("subscription.html", message = 'Subscribed successfully')
+            return render_template("success.html", message = 'Subscribed successfully')
         else:
             print "No user"
     except:
         print("Exception Raised")    
-        return render_template("error.html", error = 'You already subscibed here')
+        return render_template("success.html", error = 'You already subscibed here')
     finally:
         singleDatabase.commit()
         singleDatabase.closeCursor()
