@@ -1,0 +1,50 @@
+{% include "base.html" %}
+ 
+    <div class="container">
+      
+      
+      
+        <script>
+            function myFunction() {
+                var x = document.getElementById("myDIV");
+                if (x.style.display === "none") {
+                    x.style.display = "block";
+                } else {
+                    x.style.display = "none";
+                }
+            }
+         </script>
+      <div class="jumbotron">
+      <table >
+        <tbody>
+        {% for lap in laptop_dict %}
+        
+        
+        <tr>
+        <td> {{lap.Model}} </td>
+        <td> {{lap.Processor}} </td>
+        <td> {{lap.RAM}} </td>
+        <td> {{lap.Storage}} </td>
+        <td> {{lap.Additional}} </td>
+        
+        <td> 
+        <form action = "/subscribeToLaptop" method = "post">
+            <input value = "{{lap.Id}}" type="hidden" name="my_id">
+            <button id="myDIV" class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button> 
+        </form>    
+        </td>
+      
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+        </div>  
+      
+      
+      <footer class="footer">
+        <p>&copy; Team Ekush</p>
+      </footer>
+    </div>
+  </body>
+</html>
+ 
