@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <title>Linder: It's like real life, but better.</title>
+ 
+ 
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+ 
+    <script src="../static/js/jquery-1.11.2.js"></script>
+ 
+ 
+</head>
+ 
+<body>
+ 
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation" class="active"><a href="#">Add Item</a>
+                    </li>
+                    <li role="presentation"><a href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+            <img src="/static/boi.png" alt="Linder" width="50" height="50"/>
+            <link rel="shortcut icon" href="{{ url_for('static', filename='boi.ico') }}"> 
+
+            <h5 class="text-muted" style = " padding: 0; margin: 0;">Linder</h5>
+        </div>
+
+	<div class="jumbotron">
+        <h1>Sell Device</h1>
+        <form class="form-signin" action="/addDevice" method="post">
+        	<input type="Model" name="inputModel" id="inputModel" class="form-control" placeholder="Device Model" required  autofocus>  
+
+		<label for="inputProcessor" class="sr-only">Processor</label>
+        	<input type="Processor" name="inputProcessor" id="inputProcessor" class="form-control" placeholder="Processor" required autofocus>
+
+		<label for="inputRAM" class="sr-only">RAM</label>
+        	<input type="RAM" name="inputRAM" id="inputRAM" class="form-control" placeholder="RAM (GB)" required autofocus>
+
+		<label for="inputStorage" class="sr-only">Storage</label>
+        	<input type="Storage" name="inputStorage" id="inputStorage" class="form-control" placeholder="Storage (GB)" required autofocus>
+		
+		<label for="inputPrice" class="sr-only">Price</label>
+        	<input type="Price" name="inputPrice" id="inputPrice" class="form-control" placeholder="Price (Dollar)" required autofocus>
+
+		<label for="inputAdditional" class="sr-only">Additional Information</label>
+        	<input type="Additional" name="inputAdditional" id="inputAdditional" class="form-control" placeholder="Additional Information" required autofocus>   
+        	
+         <select name="inputType">
+        <option value="laptop">Laptop</option>
+        <option value="mobile">Mobile</option>
+        </select>
+        	
+		<button id="btnSignIn" class="btn btn-lg btn-primary btn-block" type="submit">Add To List</button>
+	</form>
+      </div>
+        <footer class="footer">
+            <p>&copy; Team Ekush</p>
+        </footer>
+ 
+    </div>
+</body>
+ 
+</html>

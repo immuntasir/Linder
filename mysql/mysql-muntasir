@@ -1,0 +1,357 @@
+DELIMITER $$
+USE `Linder`$$
+CREATE PROCEDURE `sp_getLaptopByUser` (
+IN p_user_id int(11)
+)
+BEGIN
+    select * from laptops where owner = p_user_id;
+END$$
+ 
+DELIMITER ;
+
+        
+
+
+CREATE TABLE user (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name text,
+	username text NOT NULL,    
+	email text,
+    mobile text,
+    usertype boolean DEFAULT FALSE, 
+    password text NOT NULL 
+    latitude FLOAT(11, 8)
+    longitude FLOAT(11, 8));
+    
+
+###############################################
+
+CREATE TABLE laptops (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    owner int(11) NOT NULL,
+    model text,
+	processor text NOT NULL,    
+	ram INT,
+    storage INT,
+    laptopcondition text, 
+    price INT,
+    additional text NOT NULL );
+    
+    
+CREATE TABLE laptops (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    owner int(11) NOT NULL,
+    model text,
+	processor text NOT NULL,    
+	ram INT,
+    storage INT,
+    camera INT,
+    price INT,
+    additional text NOT NULL );
+####################################################################
+
+INSERT INTO user  VALUES ("123","Muntasir","immuntasir@gmail.com","01521487023",FALSE, "hahaha");
+
+##############################################
+
+DROP procedure IF EXISTS sp_addLaptop;
+DELIMITER $$
+USE `Linder`$$
+CREATE PROCEDURE `sp_addLaptop` (
+IN pp_owner int(11),
+IN p_laptop_model text,
+IN p_laptop_processor text,
+IN p_laptop_ram int(10),
+IN p_laptop_storage int(10),
+IN p_laptopccondition text,
+IN p_laptop_price int(10),
+IN p_laptop_extra_info text
+)
+BEGIN
+	insert into laptops(
+		owner,
+		model,
+		processor,
+		ram,
+		storage,
+		laptopcondition,
+		price,
+		additional	
+	)
+	values(
+		pp_owner,
+		p_laptop_model,
+		p_laptop_processor,
+		p_laptop_ram,
+		p_laptop_storage,
+		p_laptopccondition,
+		p_laptop_price,
+		p_laptop_extra_info	
+	);
+END$$
+ 
+DELIMITER ;
+
+
+########################################################################
+
+DROP procedure IF EXISTS sp_addMobile;
+DELIMITER $$
+USE `Linder`$$
+CREATE PROCEDURE `sp_addMobile` (
+IN pp_owner int(11),
+IN p_laptop_model text,
+IN p_laptop_processor text,
+IN p_laptop_ram int(10),
+IN p_laptop_storage int(10),
+IN p_camera int(10),
+IN p_laptop_price int(10),
+IN p_laptop_extra_info text
+)
+BEGIN
+	insert into mobiles(
+		owner,
+		model,
+		processor,
+		ram,
+		storage,
+		camera,
+		price,
+		additional	
+	)
+	values(
+		pp_owner,
+		p_laptop_model,
+		p_laptop_processor,
+		p_laptop_ram,
+		p_laptop_storage,
+		p_camera,
+		p_laptop_price,
+		p_laptop_extra_info	
+	);
+END$$
+ 
+DELIMITER ;
+########################################################################
+
+
+########################################################################
+DROP procedure IF EXISTS sp_getDeviceByUser;
+DELIMITER $$
+USE `Linder`$$
+CREATE PROCEDURE `sp_getDeviceByUser` (
+IN p_user_id int(11)
+)
+BEGIN
+    (select *, 0 from mobiles where owner = p_user_id) union (select *, 1 from laptops where owner = p_user_id);
+END$$
+#######################################################################
+DROP procedure IF EXISTS sp_getMobileByUser;
+DELIMITER $$
+USE `Linder`$$
+CREATE PROCEDURE `sp_getMobileByUser` (
+IN p_user_id int(11)
+)
+BEGIN
+    select * from mobiles where owner = p_user_id;
+END$$
+ 
+DELIMITER ;
+
+CALL sp_createUser('haha', 'haa', 'haha', '1421', 0, 'asfas', 12.24, 12.12);
+########################################################################
+owner,model,processor,ram,
+		storage,camera,price,additional
+#######################################################################################
+DROP procedure IF EXISTS sp_createLaptop;
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_createLaptop`(
+    IN p_owner int(11),
+	IN p_model text,
+	IN p_processor text,
+	IN p_ram int(10),	
+	IN p_storage int(10),
+    IN p_price int(10),
+    IN p_additional text
+)
+BEGIN
+     
+        insert into laptops
+        (
+            owner,
+		    model,
+		    processor,
+		    ram,
+		    storage,
+		    price,
+		    additional
+        )
+        values
+        (
+            p_owner,
+		    p_model,
+		    p_processor,
+		    p_ram,
+		    p_storage,
+		    p_price,
+		    p_additional
+        );
+     
+    
+END$$
+DELIMITER ;
+#################################################################################
+DROP procedure IF EXISTS sp_createMobile;
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_createMobile`(
+    IN p_owner int(11),
+	IN p_model text,
+	IN p_processor text,
+	IN p_ram int(10),	
+	IN p_storage int(10),
+    IN p_camera int(10),
+    IN p_price int(10),
+    IN p_additional text
+)
+BEGIN
+   
+        insert into mobiles
+        (
+            owner,
+		    model,
+		    processor,
+		    ram,
+		    storage,
+		    camera,
+		    price,
+		    additional
+        )
+        values
+        (
+            p_owner,
+		    p_model,
+		    p_processor,
+		    p_ram,
+		    p_storage,
+		    p_camera,
+		    p_price,
+		    p_additional
+        );
+     
+    
+END$$
+DELIMITER ;
+########################################################################
+DROP procedure IF EXISTS sp_createUser;
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_createUser`(
+    IN p_name text,
+	IN p_email text,
+	IN p_username text,
+	IN p_mobile text,	
+	IN p_usertype tinyint(1),
+    IN p_password text,
+    IN p_latitude FLOAT(11, 8),
+    IN p_longitude FLOAT(11, 8)
+)
+BEGIN
+    if ( select exists (select 1 from user where username = p_username) ) THEN
+         select 'Username Exists !!';  
+    ELSE
+     
+        insert into user
+        (
+            name,
+            username,
+			email,
+		    mobile,
+			usertype,
+            password,
+            latitude,
+            longitude
+        )
+        values
+        (
+            p_name,
+            p_username,
+			p_email,
+		    p_mobile,
+			p_usertype, 
+            p_password,
+            p_latitude,
+            p_longitude
+        );
+     
+    END IF;
+END$$
+DELIMITER ;
+
+signin : 
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_validateLogin`(
+IN p_username text,
+IN p_password text
+)
+BEGIN
+    select * from user where email = p_username and password=p_password;
+END$$
+DELIMITER ;
+
+########################################################################
+
+
+
+########################################################################
+
+###################################################################
+###
+###
+###
+###################################################################
+
+CREATE TABLE mobiles (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    owner int(11) NOT NULL,
+    model text,
+	processor text NOT NULL,    
+	ram INT,
+    storage INT,
+    camera INT, 
+    price INT,
+    additional text NOT NULL );
+    
+#####################################################################
+
+##############################################
+DROP procedure IF EXISTS sp_getLatLng;
+DELIMITER $$
+USE `Linder`$$
+CREATE PROCEDURE `sp_getLatLng` (
+IN p_user_id int(11)
+)
+BEGIN
+    select latitude, longitude, name, mobile from user where id = p_user_id;
+END$$
+ 
+DELIMITER ;
+ALTER TABLE user
+ADD COLUMN latitude FLOAT(7,7) AFTER password;
+ALTER TABLE user
+ADD COLUMN longitude FLOAT(7,7) AFTER password;
+
+
+ALTER TABLE user 
+CHANGE COLUMN ismobilevisible usertype tinyint(1);
+
+ALTER TABLE user 
+CHANGE COLUMN latitude latitude FLOAT(11, 8);
+
+ALTER TABLE user 
+CHANGE COLUMN longitude longitude FLOAT(11, 8);
+
+
+
+
+
+
+
+
+
+

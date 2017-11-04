@@ -1,0 +1,76 @@
+{% include "base.html" %}
+<style>
+.card-columns {
+        column-count: 2;
+}
+.card-columns {
+    padding-top: 15px;
+    display: inline-block
+   }
+  .card {
+    border-radius: 0 !important;
+    border: 0 none;
+    width:15px;
+    -webkit-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.5);
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.5);
+    margin-left: 1px;
+    margin-right: 1px;
+    display: inline-block
+    }
+</style>
+    <div class="container">
+      <div class="jumbotron">
+        <h3> My Devices </h3>
+         
+            
+        <div class = "card-columns">            
+            {% for device in listOfDevices %}
+            
+            <div class = "card">
+                  <div class="card-block">
+                    <h4 class="card-title"> {{device.Model}} </h4>
+                    <p class="card-text"> {{device.Additional}} </p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"> Processor: {{device.Processor}} </li>
+                        <li class="list-group-item"> Ram: {{device.RAM}} GB </li>
+                        <li class="list-group-item"> Storage: {{device.Storage}} GB </li>
+                     </ul>
+                    <footer display= "inline-block">
+                        <form action = "/removeDevice" method = "post">
+                        <input value = "{{device.Id}}" type="hidden" name="dev_id">
+                        <input value = "{{device.Type}}" type="hidden" name="dev_type">
+                        <button id="myDIV" class="btn btn-default btn-sm" type="submit">
+                            <span class="glyphicon glyphicon-remove">
+                                Remove
+                        </button> 
+                        
+                        </form>               
+                                   
+                    </footer>
+                  </div>
+              </div>
+             
+            {% endfor %}
+        </div>    
+        
+        
+        
+        <form action = "/recommendedmobiles">
+            <button id="myDIV" class="btn btn-lg btn-primary btn-block" type="submit">Popular Mobiles</button> 
+        </form>
+        <form action = "/recommendedlaptops">
+            <button id="myDIV" class="btn btn-lg btn-primary btn-block" type="submit">Popular Laptops</button> 
+        </form>
+      </div>
+        
+      
+
+      <footer class="footer">
+        <p>&copy; Team Ekush</p>
+      </footer>
+
+    </div>
+  </body>
+</html>
+

@@ -1,0 +1,49 @@
+{% include "base.html" %}
+ 
+    <div class="container">
+      
+      
+      
+        <script>
+            function myFunction() {
+                var x = document.getElementById("myDIV");
+                if (x.style.display === "none") {
+                    x.style.display = "block";
+                } else {
+                    x.style.display = "none";
+                }
+            }
+         </script>
+      <div class="jumbotron">
+      <table >
+        <tbody>
+        {% for mob in mobile_dict %}
+        
+        
+        <tr>
+        <td> {{mob.Model}} </td>
+        <td> {{mob.Processor}} </td>
+        <td> {{mob.RAM}} </td>
+        <td> {{mob.Storage}} </td>
+        <td> {{mob.Additional}} </td>
+        
+        <td> 
+        <form action = "/subscribeToMobile" method = "post">
+            <input value = "{{mob.Id}}" type="hidden" name="my_id">
+            <button id="myDIV" class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button> 
+        </form>    
+        </td>
+      
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+        </div>  
+      
+      
+      <footer class="footer">
+        <p>&copy; Team Ekush</p>
+      </footer>
+    </div>
+  </body>
+</html>

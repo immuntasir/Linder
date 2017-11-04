@@ -1,0 +1,81 @@
+{% include "base.html" %}
+<style>
+.card-columns {
+        column-count: 2;
+}
+.card-columns {
+    padding-top: 15px;
+    display: inline-block
+   }
+  .card {
+    border-radius: 0 !important;
+    border: 0 none;
+    width:15px;
+    -webkit-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.5);
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.5);
+    margin-left: 1px;
+    margin-right: 1px;
+    display: inline-block
+    }
+</style>
+    <div class="container">
+      
+      
+      
+        <script>
+            function myFunction() {
+                var x = document.getElementById("myDIV");
+                if (x.style.display === "none") {
+                    x.style.display = "block";
+                } else {
+                    x.style.display = "none";
+                }
+            }
+         </script>
+      <div class = "jumbotron">
+          <div class="card-columns" >
+            {% for lap in laptop_dict %}
+              <div class = "card">
+                  <div class="card-block">
+                    <h3 class="card-title"> {{lap.Model}} </h4>
+                    <p class = "card-text"> {{lap.Distance}} kilometers away from you! </p>
+                    <p class="card-text"> {{lap.Additional}} </p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"> Processor: {{lap.Processor}} </li>
+                        <li class="list-group-item"> Ram: {{lap.RAM}} GB </li>
+                        <li class="list-group-item"> Storage: {{lap.Storage}} GB </li>
+                        <li class="list-group-item"> Price: {{lap.Price}} Only! </li>
+                        <li class="list-group-item"> Owner: {{lap.Owner}} </li>
+                        <li class="list-group-item"> Contact: {{lap.Mobile}} </li>
+                    </ul>
+                    
+                    
+                    <footer>
+                        {% if (type == "mobile") %}
+                            <form action = "/subscribeToMobile" method = "post">
+                                <input value = "{{lap.Id}}" type="hidden" name="my_id">
+                            <button id="myDIV" class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button> 
+                        </form>     
+                        {%  else  %}
+                            <form action = "/subscribeToLaptop" method = "post">
+                                <input value = "{{lap.Id}}" type="hidden" name="my_id">
+                            <button id="myDIV" class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button> 
+                        </form>     
+                        {% endif  %}
+                        
+                            
+                    </footer>
+                  </div>
+              </div>
+            {% endfor %}
+            </div>  
+        </div>         
+        
+      <footer class="footer">
+        <p>&copy; Team Ekush</p>
+      </footer>
+    </div>
+  </body>
+</html>
+ 

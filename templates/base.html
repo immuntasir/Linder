@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  	 <title>Linder: It's how people find their perfect match.</title>
+  	 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  	 <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.11.2.js') }}"></script>
+  	 
+  	 <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+    
+    <link href="../static/css/table.css" rel="stylesheet">
+    <script src="../static/js/jquery-1.11.2.js"></script>
+  	
+  	 <link href="../static/css/tab.css" rel="stylesheet">
+    <script src="../static/js/tab.js"></script>
+  	<script src="../static/js/signIn.js"></script>
+  	<script src="../static/js/signUp.js"></script>
+  	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAzledJYvnvY4inyxwTkFwuCMZutoHrW4c&callback=initMap&libraries=places"
+  type="text/javascript"></script>
+    
+   
+  	 </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="header">
+            <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+              <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <a href="#" class="navbar-left"><img src="/static/boi.png" alt="Linder" width="50" height="50></a>
+              
+
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                  <li class="nav-item active">
+                    <a class="nav-link" href="userHome"> Home </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="showDeviceSearch"> Search </a>
+                  </li>
+                  {% if session.type == 1 %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="showAddDevice"> Add Device </a>
+                  </li>
+                  {% endif %}
+                </ul>
+                <div class="navbar-nav">
+                  <a class="nav-item nav-link" href="/logout">Logout</a>
+                </div>
+              </div>
+            </nav>
+            <h3 class="text-muted" style = " padding: 0; margin: 0;">Linder: It's like Tinder, but better.</h5>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

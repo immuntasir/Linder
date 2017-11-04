@@ -1,0 +1,28 @@
+<div class="jumbotron">
+                <h3>Add a new Mobile</h3>
+                <form class="form-signin" action="/addDevice" method="post">
+                	<input type="Model" name="inputModel" id="inputModel" class="form-control" placeholder="Device Model" required  autofocus>  
+
+		        <label for="inputProcessor" class="sr-only">Processor</label>
+                	<input type="Processor" name="inputProcessor" id="inputProcessor" class="form-control" placeholder="Processor" required autofocus>
+
+		        <label for="inputRAM" class="sr-only">RAM</label>
+                	<input type="RAM" name="inputRAM" id="inputRAM" class="form-control" placeholder="RAM (GB)" required autofocus>
+
+		        <label for="inputStorage" class="sr-only">Storage</label>
+                	<input type="Storage" name="inputStorage" id="inputStorage" class="form-control" placeholder="Storage (GB)" required autofocus>
+                <label for="inputCamera" class="sr-only">Camera</label>
+                	<input type="inputCamera" name="inputCamera" id="inputCamera" class="form-control" placeholder="Camera (MP)" required autofocus>
+		
+		        <label for="inputPrice" class="sr-only">Price</label>
+                	<input type="Price" name="inputPrice" id="inputPrice" class="form-control" placeholder="Price (Dollar)" required autofocus>
+
+		        <label for="inputAdditional" class="sr-only">Additional Information</label>
+                	<input type="Additional" name="inputAdditional" id="inputAdditional" class="form-control" placeholder="Additional Information" required autofocus>   
+                	
+                <input type="radio" id="radio"
+            name="devicetype" value="mobile" checked style="display:none">
+                	
+		        <button id="btnSignIn" class="btn btn-lg btn-primary btn-block" type="submit">Add To List</button>
+	        </form>
+              </div>

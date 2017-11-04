@@ -1,0 +1,11 @@
+{% include "base.html" %}
+
+<div class = "container" > 
+    <div class = "jumbotron">
+        {% if (type == "mobile") %}
+            {% include "editMobile.html" %}     
+        {%  else  %}
+            {% include "editLaptop.html" %}
+        {% endif  %}
+    </div>
+<div>
